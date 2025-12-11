@@ -31,11 +31,6 @@ const portfolioItems: PortfolioItem[] = [
     settings: "85mm • f/2.8 • Sony A6700"
   },
   {
-    id: 5,
-    src: "/images/museum.jpg",
-    settings: "50mm • f/2 • Sony A6700"
-  },
-  {
     id: 6,
     src: "/images/kiddo.jpg",
     settings: "70mm • f/5.6 • Sony A7III"
@@ -229,22 +224,41 @@ const MobileCarousel = ({ items }: MobileCarouselProps) => {
     setCurrentIndex(index);
   };
 
+  // Preload adjacent images
+  useEffect(() => {
+    const preloadIndexes = [
+      currentIndex,
+      (currentIndex + 1) % items.length,
+      currentIndex === 0 ? items.length - 1 : currentIndex - 1
+    ];
+
+    preloadIndexes.forEach((index) => {
+      if (!imageLoaded[index]) {
+        const img = new window.Image();
+        img.src = items[index].src;
+        img.onload = () => {
+          setImageLoaded((prev) => ({ ...prev, [index]: true }));
+        };
+      }
+    });
+  }, [currentIndex, items, imageLoaded]);
+
   return (
     <div className="relative w-full flex flex-col">
       {/* Carousel Container */}
-      <div className="relative w-full h-[70vh] overflow-hidden">
-        <AnimatePresence mode="wait">
+      <div className="relative w-full h-[70vh] overflow-hidden bg-gray-100">
+        <AnimatePresence initial={false}>
           <motion.div
             key={currentIndex}
             initial={{ opacity: 0 }}
-            animate={{ opacity: imageLoaded[currentIndex] ? 1 : 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="relative w-full h-full"
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0"
           >
             {/* Loading state */}
             {!imageLoaded[currentIndex] && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
                 <div className="w-8 h-8 border-4 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
               </div>
             )}
@@ -257,9 +271,6 @@ const MobileCarousel = ({ items }: MobileCarouselProps) => {
               sizes="100vw"
               className="object-cover"
               priority={currentIndex === 0}
-              onLoad={() => {
-                setImageLoaded((prev) => ({ ...prev, [currentIndex]: true }));
-              }}
             />
           </motion.div>
         </AnimatePresence>
@@ -654,7 +665,7 @@ export default function Home() {
                   }
                 }}
               >
-                Based in New York City, I'm a hobbiest who enjoys capturing moments of all sizes. Currently, I'm shooting with the Sony A7III on Sigma prime lenses.
+                Hi I'm Mo and based in New York City, I'm a hobbiest who enjoys capturing moments of all sizes. Currently, I'm shooting on a Sony A7III on Sigma prime lenses.
               </motion.p>
               <motion.div
                 className="flex gap-6"
