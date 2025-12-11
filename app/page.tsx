@@ -55,6 +55,11 @@ const portfolioItems: PortfolioItem[] = [
     src: "/images/green.jpg",
     settings: "24mm • f/11 • Sony A6700"
   },
+  {
+    id: 10,
+    src: "/images/dapper.jpg",
+    settings: "70mm • f/5.6 • Sony A7III"
+  },
 ];
 
 type HeaderProps = {
@@ -64,7 +69,7 @@ type HeaderProps = {
 const Header = ({ onMenuClick }: HeaderProps) => (
   <header className="fixed top-0 left-0 w-full z-50 px-6 py-6 flex justify-between items-center">
     {/* Logo - Same for both mobile and desktop */}
-    <div className="font-serif text-2xl tracking-tighter italic font-bold md:mix-blend-difference md:text-white text-black">
+    <div className="font-serif text-2xl tracking-tighter italic font-bold text-black">
       ma.
     </div>
 
@@ -78,7 +83,7 @@ const Header = ({ onMenuClick }: HeaderProps) => (
     </button>
 
     {/* Desktop Nav */}
-    <nav className="hidden md:flex gap-8 text-sm uppercase tracking-widest font-light mix-blend-difference text-white">
+    <nav className="hidden md:flex gap-8 text-sm uppercase tracking-widest font-light text-black">
       <a href="#work" className="hover:opacity-50 transition-opacity">Work</a>
       <a href="#about" className="hover:opacity-50 transition-opacity">About</a>
       <a href="mailto:mamin.create@gmail.com" className="hover:opacity-50 transition-opacity">Contact</a>
@@ -126,7 +131,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
             transition={{ delay: 0.2 }}
             className="font-serif text-6xl leading-none mb-2 tracking-tighter"
           >
-            mo <span className="font-light text-gray-400">amin</span>
+            MO <span className="font-light text-gray-400">AMIN</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -507,7 +512,7 @@ export default function Home() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
             >
-              mo <span className="font-light text-gray-400">amin</span>
+              MO <span className="font-light text-gray-400">AMIN</span>
             </motion.h1>
             <motion.p
               className="max-w-md mx-auto text-sm md:text-base font-light text-gray-600 mt-8 leading-relaxed"
