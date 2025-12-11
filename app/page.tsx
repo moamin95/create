@@ -30,28 +30,29 @@ const portfolioItems: PortfolioItem[] = [
     src: "/images/doggo.jpg",
     settings: "85mm • f/2.8 • Sony A6700"
   },
+
   {
-    id: 6,
-    src: "/images/kiddo.jpg",
-    settings: "70mm • f/5.6 • Sony A7III"
-  },
-  {
-    id: 7,
+    id: 4,
     src: "/images/orange.jpg",
     settings: "35mm • f/2.8 • Sony A6700"
   },
   {
-    id: 8,
+    id: 5,
+    src: "/images/kiddo.jpg",
+    settings: "70mm • f/5.6 • Sony A7III"
+  },
+  {
+    id: 6,
     src: "/images/cave.jpg",
     settings: "24mm • f/11 • Sony A6700"
   },
   {
-    id: 9,
+    id: 7,
     src: "/images/green.jpg",
     settings: "24mm • f/11 • Sony A6700"
   },
   {
-    id: 10,
+    id: 8,
     src: "/images/dapper.jpg",
     settings: "70mm • f/5.6 • Sony A7III"
   },
