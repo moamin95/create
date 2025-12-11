@@ -38,7 +38,7 @@ const portfolioItems: PortfolioItem[] = [
   },
   {
     id: 5,
-    src: "/images/kiddo.jpg",
+    src: "/images/baby.jpg",
     settings: "70mm • f/5.6 • Sony A7III"
   },
   {
