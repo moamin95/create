@@ -5,7 +5,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 
 // Create a motion-wrapped Image component
 const MotionImage = motion(Image);
-import { X, ArrowDown, Instagram, Mail } from 'lucide-react';
+import { X, ArrowDown, Mail, ChevronLeft, ChevronRight, Menu } from 'lucide-react';
 
 // Type definitions
 type PortfolioItem = {
@@ -31,11 +31,6 @@ const portfolioItems: PortfolioItem[] = [
     settings: "85mm • f/2.8 • Sony A6700"
   },
   {
-    id: 4,
-    src: "/images/abstract.jpg",
-    settings: "35mm • f/4 • Sony A6700"
-  },
-  {
     id: 5,
     src: "/images/museum.jpg",
     settings: "50mm • f/2 • Sony A6700"
@@ -57,28 +52,107 @@ const portfolioItems: PortfolioItem[] = [
   },
   {
     id: 9,
-    src: "/images/balloon.jpg",
-    settings: "50mm • f/4 • Sony A6700"
+    src: "/images/green.jpg",
+    settings: "24mm • f/11 • Sony A6700"
   },
-  {
-    id: 10,
-    src: "/images/kiddo2.jpg",
-    settings: "85mm • f/1.8 • Sony A7III"
-  }
 ];
 
-const Header = () => (
-  <header className="fixed top-0 left-0 w-full z-50 px-6 py-6 flex justify-between items-center mix-blend-difference text-white">
-    <div className="font-serif text-2xl tracking-tighter italic font-bold">
+type HeaderProps = {
+  onMenuClick: () => void;
+};
+
+const Header = ({ onMenuClick }: HeaderProps) => (
+  <header className="fixed top-0 left-0 w-full z-50 px-6 py-6 flex justify-between items-center">
+    {/* Logo - Same for both mobile and desktop */}
+    <div className="font-serif text-2xl tracking-tighter italic font-bold md:mix-blend-difference md:text-white text-black">
       ma.
     </div>
-    <nav className="hidden md:flex gap-8 text-sm uppercase tracking-widest font-light">
+
+    {/* Mobile Hamburger Menu */}
+    <button
+      onClick={onMenuClick}
+      className="md:hidden text-black"
+      aria-label="Open menu"
+    >
+      <Menu size={24} />
+    </button>
+
+    {/* Desktop Nav */}
+    <nav className="hidden md:flex gap-8 text-sm uppercase tracking-widest font-light mix-blend-difference text-white">
       <a href="#work" className="hover:opacity-50 transition-opacity">Work</a>
       <a href="#about" className="hover:opacity-50 transition-opacity">About</a>
       <a href="mailto:mamin.create@gmail.com" className="hover:opacity-50 transition-opacity">Contact</a>
     </nav>
   </header>
 );
+
+type MobileMenuProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '100%' }}
+        transition={{ type: 'tween', duration: 0.3 }}
+        className="fixed inset-0 z-[70] bg-[#FDFBF7] flex flex-col"
+      >
+        {/* Close Button */}
+        <div className="px-6 py-6 flex justify-end">
+          <button onClick={onClose} aria-label="Close menu">
+            <X size={28} />
+          </button>
+        </div>
+
+        {/* Menu Content */}
+        <div className="flex-1 flex flex-col items-center justify-start px-6 pt-36 text-center">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-xs uppercase tracking-[0.3em] mb-6 text-gray-500"
+          >
+            Photography Portfolio
+          </motion.p>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="font-serif text-6xl leading-none mb-2 tracking-tighter"
+          >
+            mo <span className="font-light text-gray-400">amin</span>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="max-w-md mx-auto text-sm font-light text-gray-600 mt-8 leading-relaxed mb-12"
+          >
+            Capturing moments of stillness in an ever-changing world.
+            Specializing in street, portrait, and architectural photography.
+          </motion.p>
+
+          {/* Contact Link */}
+          <motion.a
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            href="mailto:mamin.create@gmail.com"
+            className="flex items-center gap-2 text-sm uppercase tracking-widest hover:text-black transition-colors text-gray-600 border border-gray-300 px-6 py-3 rounded-full"
+          >
+            <Mail size={18} /> Contact Me
+          </motion.a>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
 
 type ParallaxImageProps = {
   item: PortfolioItem;
@@ -100,7 +174,7 @@ const ParallaxImage = ({ item, onClick }: ParallaxImageProps) => {
   return (
     <motion.div
       ref={ref}
-      className="group relative w-full h-[80vh] mb-24 overflow-hidden cursor-pointer"
+      className="group relative w-full h-[70vh] mb-24 overflow-hidden cursor-pointer"
       onClick={() => onClick(item)}
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -130,116 +204,97 @@ const ParallaxImage = ({ item, onClick }: ParallaxImageProps) => {
 
 type MobileCarouselProps = {
   items: PortfolioItem[];
-  onImageClick: (item: PortfolioItem) => void;
 };
 
-const MobileCarousel = ({ items, onImageClick }: MobileCarouselProps) => {
+const MobileCarousel = ({ items }: MobileCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState<{ [key: number]: boolean }>({});
 
-  const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0
-    }),
-    center: {
-      x: 0,
-      opacity: 1
-    },
-    exit: (direction: number) => ({
-      x: direction < 0 ? 1000 : -1000,
-      opacity: 0
-    })
+  const currentItem = items[currentIndex];
+
+  const goToPrevious = () => {
+    setCurrentIndex((prev) => (prev === 0 ? items.length - 1 : prev - 1));
   };
 
-  const swipeConfidenceThreshold = 10000;
-  const swipePower = (offset: number, velocity: number) => {
-    return Math.abs(offset) * velocity;
+  const goToNext = () => {
+    setCurrentIndex((prev) => (prev === items.length - 1 ? 0 : prev + 1));
   };
 
-  const paginate = (newDirection: number) => {
-    const nextIndex = currentIndex + newDirection;
-    if (nextIndex >= 0 && nextIndex < items.length) {
-      setCurrentIndex(nextIndex);
-    }
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index);
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col justify-center mb-20">
+    <div className="relative w-full flex flex-col">
       {/* Carousel Container */}
-      <div className="relative w-full h-[75vh] overflow-hidden mb-8">
-        <AnimatePresence initial={false} custom={currentIndex}>
+      <div className="relative w-full h-[70vh] overflow-hidden">
+        <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            custom={currentIndex}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{
-              x: { type: "spring", stiffness: 300, damping: 30 },
-              opacity: { duration: 0.2 }
-            }}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={1}
-            onDragEnd={(_, { offset, velocity }) => {
-              const swipe = swipePower(offset.x, velocity.x);
-
-              if (swipe < -swipeConfidenceThreshold) {
-                paginate(1);
-              } else if (swipe > swipeConfidenceThreshold) {
-                paginate(-1);
-              }
-            }}
-            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: imageLoaded[currentIndex] ? 1 : 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="relative w-full h-full"
           >
-            <div
-              className="relative w-full h-full rounded-lg overflow-hidden cursor-pointer"
-              onClick={() => onImageClick(items[currentIndex])}
-            >
-              <Image
-                src={items[currentIndex].src}
-                alt="Portfolio image"
-                fill
-                sizes="100vw"
-                className="object-cover"
-                priority
-              />
-              {/* Overlay Info */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 pointer-events-none flex justify-center">
-                <p className="text-white text-xs tracking-wider">{items[currentIndex].settings}</p>
+            {/* Loading state */}
+            {!imageLoaded[currentIndex] && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                <div className="w-8 h-8 border-4 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
               </div>
-            </div>
+            )}
+
+            {/* Image */}
+            <Image
+              src={currentItem.src}
+              alt="Portfolio image"
+              fill
+              sizes="100vw"
+              className="object-cover"
+              priority={currentIndex === 0}
+              onLoad={() => {
+                setImageLoaded((prev) => ({ ...prev, [currentIndex]: true }));
+              }}
+            />
           </motion.div>
         </AnimatePresence>
 
-        {/* Swipe Indicators - Only on Image */}
-        {currentIndex > 0 && (
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 pointer-events-none">
-            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-          </div>
-        )}
-        {currentIndex < items.length - 1 && (
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 pointer-events-none">
-            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M9 18l6-6-6-6" />
-            </svg>
-          </div>
-        )}
+        {/* Navigation Buttons */}
+        <button
+          onClick={goToPrevious}
+          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors backdrop-blur-sm z-10"
+          aria-label="Previous image"
+        >
+          <ChevronLeft size={24} />
+        </button>
+        <button
+          onClick={goToNext}
+          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors backdrop-blur-sm z-10"
+          aria-label="Next image"
+        >
+          <ChevronRight size={24} />
+        </button>
       </div>
 
-      {/* Navigation Dots - Below Image */}
-      <div className="flex justify-center gap-2">
+      {/* Settings - Below Image */}
+      <div className="flex justify-center py-4">
+        <div className="text-gray-600 font-sans text-xs tracking-wider">
+          {currentItem.settings}
+        </div>
+      </div>
+
+      {/* Dots Indicator */}
+      <div className="flex justify-center items-center gap-2 pb-6">
         {items.map((_, index) => (
           <button
             key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`h-2 rounded-full transition-all ${
-              index === currentIndex ? 'bg-gray-800 w-8' : 'bg-gray-400 w-2'
+            onClick={() => goToSlide(index)}
+            className={`transition-all duration-300 rounded-full ${
+              index === currentIndex
+                ? 'w-8 h-2 bg-gray-800'
+                : 'w-2 h-2 bg-gray-300 hover:bg-gray-400'
             }`}
-            aria-label={`Go to slide ${index + 1}`}
+            aria-label={`Go to image ${index + 1}`}
           />
         ))}
       </div>
@@ -383,6 +438,7 @@ const Lightbox = ({ item, onClose }: LightboxProps) => {
 export default function Home() {
   const [selectedImage, setSelectedImage] = useState<PortfolioItem | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Detect mobile on mount and resize
   useEffect(() => {
@@ -391,6 +447,16 @@ export default function Home() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Lock scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = '';
+      };
+    }
+  }, [mobileMenuOpen]);
 
   // Load fonts dynamically and enable smooth scrolling
   useEffect(() => {
@@ -416,11 +482,11 @@ export default function Home() {
         .font-sans { font-family: 'Lato', sans-serif; }
       `}</style>
 
-      <Header />
+      <Header onMenuClick={() => setMobileMenuOpen(true)} />
 
       <main>
-        {/* Hero Section */}
-        <section className="h-screen flex flex-col items-center justify-center relative px-6 overflow-hidden">
+        {/* Hero Section - Hidden on Mobile */}
+        <section className="hidden md:flex h-screen flex-col items-center justify-center relative px-6 overflow-hidden">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -454,27 +520,31 @@ export default function Home() {
             </motion.p>
           </motion.div>
 
-          <motion.div
+          <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5, duration: 1 }}
-            className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce"
+            className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce cursor-pointer hover:text-gray-600 transition-colors"
+            onClick={() => {
+              document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            aria-label="Scroll to gallery"
           >
             <ArrowDown className="text-gray-400" size={24} />
-          </motion.div>
+          </motion.button>
         </section>
 
         {/* Gallery Section */}
-        <section id="work" className="px-4 md:px-12 py-20">
+        <section id="work" className="px-4 md:px-12 pt-24 md:pt-20 pb-20">
           <div className="max-w-6xl mx-auto">
             {/* Mobile Carousel */}
             <div className="md:hidden">
-              <MobileCarousel items={portfolioItems} onImageClick={setSelectedImage} />
+              <MobileCarousel items={portfolioItems} />
             </div>
 
             {/* Desktop Grid */}
             <motion.div
-              className="hidden md:grid grid-cols-12 gap-6"
+              className="hidden md:grid md:grid-cols-12 gap-6"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-50px" }}
@@ -491,7 +561,7 @@ export default function Home() {
                   key={item.id}
                   className={`${
                     // Simple masonry-like offset logic
-                    index % 3 === 0 ? 'col-span-12' : 'col-span-6'
+                    index % 3 === 0 ? 'md:col-span-12' : 'md:col-span-6'
                     }`}
                   variants={{
                     hidden: { opacity: 0, y: 60 },
@@ -505,10 +575,8 @@ export default function Home() {
                     }
                   }}
                 >
-                  {/* Adjust margins to create a staggered, non-grid feel
-                      for elegance
-                   */}
-                  <div className={`${index % 2 !== 0 && index % 3 !== 0 ? 'mt-32' : ''}`}>
+                  {/* Adjust margins to create a staggered, non-grid feel for elegance */}
+                  <div className={`${index % 2 !== 0 && index % 3 !== 0 ? 'md:mt-32' : ''}`}>
                     <ParallaxImage item={item} onClick={setSelectedImage} />
                   </div>
                 </motion.div>
@@ -581,7 +649,7 @@ export default function Home() {
                   }
                 }}
               >
-                Based in New York City, I'm a hobbiest who enjoys capturing moments of all sizes. Currently, I'm shooting with the Sony A7III.
+                Based in New York City, I'm a hobbiest who enjoys capturing moments of all sizes. Currently, I'm shooting with the Sony A7III on Sigma prime lenses.
               </motion.p>
               <motion.div
                 className="flex gap-6"
@@ -627,6 +695,9 @@ export default function Home() {
           <Lightbox item={selectedImage} onClose={() => setSelectedImage(null)} />
         )
       )}
+
+      {/* Mobile Menu */}
+      <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
     </div>
   );
 }
